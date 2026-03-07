@@ -4,8 +4,9 @@ use godot::prelude::*;
 
 use crate::application::fase_posicionamento::FasePosicionamento;
 use crate::application::fase_selecao_dificuldade::FaseSelecaoDificuldade;
+use crate::application::gerenciador_interface::GerenciadorInterface;
+use crate::application::gerenciador_turnos::{EstadoTurno, GerenciadorTurnos};
 use crate::application::helpers::{conversao_coordenadas, coordenadas, cursor};
-use crate::application::gerenciador_turnos::{GerenciadorTurnos, EstadoTurno};
 use crate::domain::disparo::ResultadoDisparo;
 use crate::domain::jogador::Jogador;
 use crate::domain::jogador_ia::JogadorIA;
@@ -23,6 +24,7 @@ pub struct ControladorBatalha {
     fase_posicionamento: FasePosicionamento,
     fase_selecao_dificuldade: FaseSelecaoDificuldade,
     gerenciador_turnos: GerenciadorTurnos,
+    gerenciador_interface: GerenciadorInterface,
     tempo_restante_ia: f64,
     tooltip_instrucao: Option<Gd<Label>>,
     base: Base<Node2D>,
@@ -42,6 +44,7 @@ impl INode2D for ControladorBatalha {
             fase_posicionamento: FasePosicionamento::nova(),
             fase_selecao_dificuldade: FaseSelecaoDificuldade::nova(),
             gerenciador_turnos: GerenciadorTurnos::novo(total_navios),
+            gerenciador_interface: GerenciadorInterface::novo(),
             tempo_restante_ia: 0.0,
             tooltip_instrucao: None,
             base,
@@ -55,6 +58,8 @@ impl INode2D for ControladorBatalha {
         if let Some(campo_ia) = self.base().try_get_node_as::<TileMapLayer>("CampoIA") {
             coordenadas::gerar_coordenadas(campo_ia);
         }
+
+        self.gerenciador_interface.inicializar(self.base().clone());
     }
 
     fn process(&mut self, delta: f64) {
@@ -88,6 +93,10 @@ impl INode2D for ControladorBatalha {
         }
 
         self.atualizar_controle_cursor();
+        self.gerenciador_interface.atualizar(
+            self.gerenciador_turnos.estado_atual(),
+            self.gerenciador_turnos.rodada_atual(),
+        );
 
         if self.gerenciador_turnos.estado_atual() == EstadoTurno::TurnoIA {
             self.tempo_restante_ia -= delta;
@@ -342,5 +351,4 @@ impl ControladorBatalha {
         }
     }
 }
-
 
