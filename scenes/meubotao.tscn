@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://bo6cmgk4y7g23"]
+
+[ext_resource type="FontFile" uid="uid://cbvk8gbmixmbq" path="res://fonts/Retro Gaming.ttf" id="1_pfgyr"]
+
+[node name="Button" type="Button" unique_id=1246405146]
+offset_left = 255.0
+offset_top = 243.0
+offset_right = 338.0
+offset_bottom = 277.0
+theme_override_fonts/font = ExtResource("1_pfgyr")
+theme_override_font_sizes/font_size = 20
+text = "Jogar"

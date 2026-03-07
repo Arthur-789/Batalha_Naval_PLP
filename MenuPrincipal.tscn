@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://ckxroacem0nru"]
+
+[ext_resource type="Texture2D" uid="uid://hj5ghj0wwe2h" path="res://background_menu.webp" id="1_5dpk2"]
+[ext_resource type="FontFile" uid="uid://cbvk8gbmixmbq" path="res://fonts/Retro Gaming.ttf" id="2_pi62y"]
+[ext_resource type="PackedScene" uid="uid://bo6cmgk4y7g23" path="res://scenes/meubotao.tscn" id="3_ectly"]
+[ext_resource type="Script" uid="uid://c2y3w4nruu3q0" path="res://v_box_container.gd" id="3_pi62y"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_knros"]
+font = ExtResource("2_pi62y")
+font_size = 48
+font_color = Color(0.94509804, 0.76862746, 0.05882353, 1)
+shadow_size = 18
+shadow_color = Color(0.49411765, 0.31764707, 0.03529412, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5dpk2"]
+content_margin_left = 15.0
+content_margin_top = 15.0
+content_margin_right = 15.0
+content_margin_bottom = 15.0
+bg_color = Color(0.44313726, 0.79607844, 0.9647059, 0.6392157)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[node name="Margin container" type="TextureRect" unique_id=1118339370]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_5dpk2")
+expand_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=605589437]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 60
+
+[node name="Label" type="Label" parent="MarginContainer" unique_id=752176807]
+layout_mode = 2
+size_flags_vertical = 0
+text = "BattleShip Rust"
+label_settings = SubResource("LabelSettings_knros")
+horizontal_alignment = 1
+
+[node name="MargemBotoes" type="PanelContainer" parent="." unique_id=360564036]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -225.0
+offset_top = -66.0
+offset_right = -94.0
+offset_bottom = 96.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_5dpk2")
+
+[node name="botoes" type="VBoxContainer" parent="MargemBotoes" unique_id=1054789272]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 15
+script = ExtResource("3_pi62y")
+
+[node name="start" parent="MargemBotoes/botoes" unique_id=1246405146 instance=ExtResource("3_ectly")]
+layout_mode = 2
+
+[node name="option" parent="MargemBotoes/botoes" unique_id=437671320 instance=ExtResource("3_ectly")]
+layout_mode = 2
+text = "Opções"
+
+[node name="sair" parent="MargemBotoes/botoes" unique_id=1385780686 instance=ExtResource("3_ectly")]
+layout_mode = 2
+text = "Sair"
