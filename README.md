@@ -38,16 +38,19 @@ A pasta `src/` está organizada por camadas:
   - Define `ResultadoDisparo`.
   - Define `RetornoDisparo { resultado, mensagem }`.
   - Implementa `executar_disparo(...)` com regra de tiro e mensagem de feedback.
-- `player.rs`:
-  - Define a classe `Jogador` (estrutura básica atual).
+- `jogador.rs`:
+  - Define `TipoJogador` e `Jogador` com estado comum (tabuleiro e regras básicas).
+- `jogador_ia.rs`:
+  - Define `JogadorIA` e `EstrategiaIA` para comportamento da IA por estratégia.
 
 ### `src/presentation/`
 
 - `mod.rs`: índice dos módulos de apresentação.
-- `cena_tabuleiro_batalha.rs`:
-  - Classe Godot `CenaTabuleiroBatalha`.
-  - Gera coordenadas visuais (A-J e 1-10).
-  - Controla cursor visual no tabuleiro do jogador.
+- `batalha/`:
+  - Feature de apresentação da batalha.
+  - `renderizacao_tabuleiro/`: renderização de tiles, preview e mapeamento visual dos navios.
+- `legacy/`:
+  - Arquivos antigos de apresentação que não fazem parte do fluxo ativo.
 
 ## Fluxo atual (resumo)
 
