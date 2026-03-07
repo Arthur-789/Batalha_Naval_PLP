@@ -98,6 +98,10 @@ impl GerenciadorTurnos {
         )
     }
 
+    pub fn rodada_atual(&self) -> u32 {
+        self.numero_turno
+    }
+
     fn avancar_para_turno_ia(&mut self) {
         self.estado_atual = EstadoTurno::TurnoIA;
     }

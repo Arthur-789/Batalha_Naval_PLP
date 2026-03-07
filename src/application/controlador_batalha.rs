@@ -1,11 +1,13 @@
 use godot::classes::{INode2D, Input, InputEvent, InputEventKey, InputEventMouseButton, Label, Node2D, TileMapLayer};
-use godot::global::MouseButton;
+use godot::global::{Key, MouseButton};
 use godot::prelude::*;
 
 use crate::application::fase_posicionamento::FasePosicionamento;
 use crate::application::fase_selecao_dificuldade::FaseSelecaoDificuldade;
+use crate::application::gerenciador_audio::GerenciadorAudio;
+use crate::application::gerenciador_interface::GerenciadorInterface;
+use crate::application::gerenciador_turnos::{EstadoTurno, GerenciadorTurnos};
 use crate::application::helpers::{conversao_coordenadas, coordenadas, cursor};
-use crate::application::gerenciador_turnos::{GerenciadorTurnos, EstadoTurno};
 use crate::domain::disparo::ResultadoDisparo;
 use crate::domain::jogador::Jogador;
 use crate::domain::jogador_ia::JogadorIA;
@@ -13,7 +15,7 @@ use crate::presentation::batalha::{
     limpar_preview, render_preview_posicionamento, render_resultado_disparo, render_tabuleiro_jogador,
 };
 
-const DELAY_TURNO_IA: f64 = 0.7;
+const DELAY_TURNO_IA: f64 = 1.0;
 
 #[derive(GodotClass)]
 #[class(base = Node2D)]
@@ -23,7 +25,10 @@ pub struct ControladorBatalha {
     fase_posicionamento: FasePosicionamento,
     fase_selecao_dificuldade: FaseSelecaoDificuldade,
     gerenciador_turnos: GerenciadorTurnos,
+    gerenciador_interface: GerenciadorInterface,
+    gerenciador_audio: GerenciadorAudio,
     tempo_restante_ia: f64,
+    estado_anterior: EstadoTurno,
     tooltip_instrucao: Option<Gd<Label>>,
     base: Base<Node2D>,
 }
@@ -42,7 +47,10 @@ impl INode2D for ControladorBatalha {
             fase_posicionamento: FasePosicionamento::nova(),
             fase_selecao_dificuldade: FaseSelecaoDificuldade::nova(),
             gerenciador_turnos: GerenciadorTurnos::novo(total_navios),
+            gerenciador_interface: GerenciadorInterface::novo(),
+            gerenciador_audio: GerenciadorAudio::novo(),
             tempo_restante_ia: 0.0,
+            estado_anterior: EstadoTurno::SelecaoDificuldade,
             tooltip_instrucao: None,
             base,
         }
@@ -55,16 +63,26 @@ impl INode2D for ControladorBatalha {
         if let Some(campo_ia) = self.base().try_get_node_as::<TileMapLayer>("CampoIA") {
             coordenadas::gerar_coordenadas(campo_ia);
         }
+
+        self.gerenciador_interface.inicializar(self.base().clone());
+        
+        // Inicializar áudio com o nó base
+        let node = self.base().clone().upcast::<Node>();
+        self.gerenciador_audio.inicializar(&node);
+        
+        // Iniciar música e ondas desde o início (planejamento)
+        self.gerenciador_audio.tocar_musica_batalha();
+        self.gerenciador_audio.tocar_ondas();
     }
 
     fn process(&mut self, delta: f64) {
+        // Atualizar interface primeiro, independente do estado
+        self.gerenciador_interface.atualizar(
+            self.gerenciador_turnos.estado_atual(),
+            self.gerenciador_turnos.rodada_atual(),
+        );
+
         if self.gerenciador_turnos.estado_atual() == EstadoTurno::SelecaoDificuldade {
-            if let Some(mut tooltip) = self.tooltip_instrucao.clone() {
-                tooltip.set_text(self.fase_selecao_dificuldade.texto_tooltip());
-                tooltip.set_visible(true);
-                tooltip.set_position(Vector2::new(20.0, 20.0));
-            }
-            
             if let Some(campo_jogador) = self.base().try_get_node_as::<TileMapLayer>("CampoJogador") {
                 cursor::esconder_cursor(campo_jogador);
             }
@@ -89,6 +107,24 @@ impl INode2D for ControladorBatalha {
 
         self.atualizar_controle_cursor();
 
+        // Processar delays de som
+        self.gerenciador_audio.processar_delays(delta);
+
+        // Detectar fim de jogo e tocar sons apropriados
+        let estado_atual = self.gerenciador_turnos.estado_atual();
+        if estado_atual != self.estado_anterior {
+            match estado_atual {
+                EstadoTurno::VitoriaJogador => {
+                    self.gerenciador_audio.tocar_vitoria();
+                }
+                EstadoTurno::VitoriaIA => {
+                    self.gerenciador_audio.tocar_derrota();
+                }
+                _ => {}
+            }
+            self.estado_anterior = estado_atual;
+        }
+
         if self.gerenciador_turnos.estado_atual() == EstadoTurno::TurnoIA {
             self.tempo_restante_ia -= delta;
             if self.tempo_restante_ia <= 0.0 {
@@ -98,7 +134,17 @@ impl INode2D for ControladorBatalha {
     }
 
     fn input(&mut self, event: Gd<InputEvent>) {
+        // Detectar R para reiniciar quando o jogo terminou
         if self.gerenciador_turnos.jogo_terminou() {
+            if let Ok(key_event) = event.try_cast::<InputEventKey>() {
+                if key_event.is_pressed() && !key_event.is_echo() {
+                    let keycode = key_event.get_keycode();
+                    if keycode == Key::R {
+                        let mut tree = self.base().get_tree();
+                        tree.reload_current_scene();
+                    }
+                }
+            }
             return;
         }
 
@@ -129,6 +175,39 @@ impl INode2D for ControladorBatalha {
                     self.tratar_clique_disparo_jogador(click_pos);
                 }
                 _ => {}
+            }
+        }
+    }
+}
+
+#[godot_api]
+impl ControladorBatalha {
+    #[func]
+    pub fn selecionar_dificuldade_facil(&mut self) {
+        if self.gerenciador_turnos.estado_atual() == EstadoTurno::SelecaoDificuldade {
+            if let Some(ia) = self.fase_selecao_dificuldade.processar_selecao(0) {
+                self.jogador_ia = Some(ia);
+                self.gerenciador_turnos.confirmar_dificuldade();
+            }
+        }
+    }
+
+    #[func]
+    pub fn selecionar_dificuldade_media(&mut self) {
+        if self.gerenciador_turnos.estado_atual() == EstadoTurno::SelecaoDificuldade {
+            if let Some(ia) = self.fase_selecao_dificuldade.processar_selecao(1) {
+                self.jogador_ia = Some(ia);
+                self.gerenciador_turnos.confirmar_dificuldade();
+            }
+        }
+    }
+
+    #[func]
+    pub fn selecionar_dificuldade_dificil(&mut self) {
+        if self.gerenciador_turnos.estado_atual() == EstadoTurno::SelecaoDificuldade {
+            if let Some(ia) = self.fase_selecao_dificuldade.processar_selecao(2) {
+                self.jogador_ia = Some(ia);
+                self.gerenciador_turnos.confirmar_dificuldade();
             }
         }
     }
@@ -252,22 +331,28 @@ impl ControladorBatalha {
             return;
         };
 
-        let Some(ref mut ia) = self.jogador_ia else {
-            return;
+        let (retorno, ia_perdeu) = {
+            let Some(ref mut ia) = self.jogador_ia else {
+                return;
+            };
+            let retorno = ia.receber_disparo(x, y);
+            godot_print!("{}", retorno.mensagem);
+            let ia_perdeu = ia.perdeu();
+            (retorno, ia_perdeu)
         };
-
-        let retorno = ia.receber_disparo(x, y);
-        godot_print!("{}", retorno.mensagem);
 
         render_resultado_disparo(&mut enemy_map, map_coord, &retorno.resultado);
 
         if retorno.resultado.foi_valido() {
+            // Só tocar som se o disparo foi válido
+            self.gerenciador_audio.tocar_disparo_com_resultado(&retorno.resultado);
+            
             let acertou = matches!(retorno.resultado, ResultadoDisparo::Acerto | ResultadoDisparo::Afundou(_));
             let afundou = matches!(retorno.resultado, ResultadoDisparo::Afundou(_));
             
             self.gerenciador_turnos.processar_ataque_jogador(acertou, afundou);
             
-            if ia.perdeu() {
+            if ia_perdeu {
                 return;
             }
             
@@ -278,18 +363,28 @@ impl ControladorBatalha {
     }
 
     fn executar_turno_ia(&mut self) {
-        let Some(ref mut ia) = self.jogador_ia else {
-            return;
+        let (x, y, retorno) = {
+            let Some(ref mut ia) = self.jogador_ia else {
+                return;
+            };
+
+            let Some((x, y)) = ia.escolher_alvo(self.jogador_humano.tabuleiro()) else {
+                return;
+            };
+
+            let retorno = self.jogador_humano.receber_disparo(x, y);
+            godot_print!("IA: {}", retorno.mensagem);
+
+            (x, y, retorno)
         };
 
-        let Some((x, y)) = ia.escolher_alvo(self.jogador_humano.tabuleiro()) else {
-            return;
-        };
+        // Tocar disparo e agendar resultado
+        self.gerenciador_audio.tocar_disparo_com_resultado(&retorno.resultado);
 
-        let retorno = self.jogador_humano.receber_disparo(x, y);
-        godot_print!("IA: {}", retorno.mensagem);
-
-        ia.notificar_resultado(x, y, &retorno);
+        // Notificar a IA do resultado
+        if let Some(ref mut ia) = self.jogador_ia {
+            ia.notificar_resultado(x, y, &retorno);
+        }
 
         if let Some(mut player_map) = self.base().try_get_node_as::<TileMapLayer>("CampoJogador") {
             render_resultado_disparo(
@@ -342,5 +437,4 @@ impl ControladorBatalha {
         }
     }
 }
-
 
