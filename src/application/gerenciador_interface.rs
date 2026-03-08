@@ -1,4 +1,4 @@
-use godot::classes::{Button, FontFile, Label, Node2D, ResourceLoader};
+use godot::classes::{Button, FontFile, GridContainer, Label, Node2D, ResourceLoader};
 use godot::global::HorizontalAlignment;
 use godot::prelude::*;
 
@@ -8,12 +8,10 @@ pub struct GerenciadorInterface {
     label_fase: Option<Gd<Label>>,
     label_turno: Option<Gd<Label>>,
     label_resultado: Option<Gd<Label>>,
-    label_reiniciar: Option<Gd<Label>>,
-    label_instrucao_dificuldade: Option<Gd<Label>>,
+    botao_continuar: Option<Gd<Button>>,
     label_ajuda_posicionamento: Option<Gd<Label>>,
-    botao_facil: Option<Gd<Button>>,
-    botao_medio: Option<Gd<Button>>,
-    botao_dificil: Option<Gd<Button>>,
+    botao_confirmar_posicionamento: Option<Gd<Button>>,
+    container_navios: Option<Gd<GridContainer>>,
 }
 
 impl GerenciadorInterface {
@@ -22,12 +20,10 @@ impl GerenciadorInterface {
             label_fase: None,
             label_turno: None,
             label_resultado: None,
-            label_reiniciar: None,
-            label_instrucao_dificuldade: None,
+            botao_continuar: None,
             label_ajuda_posicionamento: None,
-            botao_facil: None,
-            botao_medio: None,
-            botao_dificil: None,
+            botao_confirmar_posicionamento: None,
+            container_navios: None,
         }
     }
 
@@ -85,38 +81,18 @@ impl GerenciadorInterface {
             self.label_resultado = Some(label_resultado);
         }
 
-        if let Some(mut label_reiniciar) = node.try_get_node_as::<Label>("LabelReiniciar") {
+        if let Some(mut botao_continuar) = node.try_get_node_as::<Button>("BotaoContinuar") {
             if let Some(ref font_file) = font {
-                label_reiniciar.add_theme_font_override("font", font_file);
+                botao_continuar.add_theme_font_override("font", font_file);
             }
-            label_reiniciar.add_theme_font_size_override("font_size", 18);
-            label_reiniciar.add_theme_color_override("font_color", Color::from_rgb(0.0, 0.0, 0.0));
-            label_reiniciar.add_theme_color_override("font_outline_color", Color::from_rgb(1.0, 1.0, 1.0));
-            label_reiniciar.add_theme_constant_override("outline_size", 3);
-            label_reiniciar.set_horizontal_alignment(HorizontalAlignment::CENTER);
-            label_reiniciar.set_position(Vector2::new(100.0, 360.0));
-            label_reiniciar.set_size(Vector2::new(400.0, 40.0));
-            label_reiniciar.set_z_index(100);
-            label_reiniciar.set_text("Pressione R para reiniciar");
-            label_reiniciar.set_visible(false);
-            self.label_reiniciar = Some(label_reiniciar);
-        }
-
-        if let Some(mut label_instrucao) = node.try_get_node_as::<Label>("LabelInstrucaoDificuldade") {
-            if let Some(ref font_file) = font {
-                label_instrucao.add_theme_font_override("font", font_file);
-            }
-            label_instrucao.add_theme_font_size_override("font_size", 28);
-            label_instrucao.add_theme_color_override("font_color", Color::from_rgb(0.0, 0.0, 0.0));
-            label_instrucao.add_theme_color_override("font_outline_color", Color::from_rgb(1.0, 1.0, 1.0));
-            label_instrucao.add_theme_constant_override("outline_size", 4);
-            label_instrucao.set_horizontal_alignment(HorizontalAlignment::CENTER);
-            label_instrucao.set_position(Vector2::new(100.0, 300.0));
-            label_instrucao.set_size(Vector2::new(400.0, 50.0));
-            label_instrucao.set_z_index(100);
-            label_instrucao.set_text("Selecione a Dificuldade");
-            label_instrucao.set_visible(false);
-            self.label_instrucao_dificuldade = Some(label_instrucao);
+            botao_continuar.add_theme_font_size_override("font_size", 20);
+            botao_continuar.add_theme_color_override("font_color", Color::from_rgb(1.0, 1.0, 1.0));
+            botao_continuar.set_position(Vector2::new(225.0, 340.0));
+            botao_continuar.set_size(Vector2::new(150.0, 40.0));
+            botao_continuar.set_z_index(100);
+            botao_continuar.set_text("Continuar");
+            botao_continuar.set_visible(false);
+            self.botao_continuar = Some(botao_continuar);
         }
 
         if let Some(mut label_ajuda) = node.try_get_node_as::<Label>("LabelAjudaPosicionamento") {
@@ -136,41 +112,31 @@ impl GerenciadorInterface {
             self.label_ajuda_posicionamento = Some(label_ajuda);
         }
 
-        // Configurar botões de dificuldade
-        if let Some(mut botao) = node.try_get_node_as::<Button>("BotaoFacil") {
-            if let Some(ref font_file) = font {
-                botao.add_theme_font_override("font", font_file);
-            }
-            botao.add_theme_font_size_override("font_size", 20);
-            botao.set_position(Vector2::new(120.0, 340.0));
-            botao.set_size(Vector2::new(120.0, 40.0));
-            botao.set_text("Fácil");
-            botao.set_visible(false);
-            self.botao_facil = Some(botao);
-        }
-
-        if let Some(mut botao) = node.try_get_node_as::<Button>("BotaoMedio") {
-            if let Some(ref font_file) = font {
-                botao.add_theme_font_override("font", font_file);
-            }
-            botao.add_theme_font_size_override("font_size", 20);
-            botao.set_position(Vector2::new(250.0, 340.0));
-            botao.set_size(Vector2::new(120.0, 40.0));
-            botao.set_text("Médio");
-            botao.set_visible(false);
-            self.botao_medio = Some(botao);
-        }
-
-        if let Some(mut botao) = node.try_get_node_as::<Button>("BotaoDificil") {
-            if let Some(font_file) = font {
+        if let Some(mut botao) = node.try_get_node_as::<Button>("BotaoConfirmarPosicionamento") {
+            if let Some(font_file) = font.clone() {
                 botao.add_theme_font_override("font", &font_file);
             }
-            botao.add_theme_font_size_override("font_size", 20);
-            botao.set_position(Vector2::new(380.0, 340.0));
-            botao.set_size(Vector2::new(120.0, 40.0));
-            botao.set_text("Difícil");
+            botao.add_theme_font_size_override("font_size", 22);
+            botao.set_position(Vector2::new(180.0, 320.0));
+            botao.set_size(Vector2::new(240.0, 50.0));
+            botao.set_text("Começar Batalha");
             botao.set_visible(false);
-            self.botao_dificil = Some(botao);
+            self.botao_confirmar_posicionamento = Some(botao);
+        }
+
+        if let Some(mut container) = node.try_get_node_as::<GridContainer>("UILayer/ContainerNavios") {
+            godot_print!("ContainerNavios (GridContainer) encontrado com sucesso no UILayer!");            
+            // Posicionar o container de navios na parte inferior
+            container.set_position(Vector2::new(160.0, 310.0));
+            container.set_size(Vector2::new(530.0, 120.0));
+            container.set_columns(3);
+            container.add_theme_constant_override("h_separation", 2);
+            container.add_theme_constant_override("v_separation", 5);
+            container.set_visible(false);
+            
+            self.container_navios = Some(container);
+        } else {
+            godot_print!("AVISO: ContainerNavios não foi encontrado em UILayer/ContainerNavios!");
         }
     }
 
@@ -186,23 +152,11 @@ impl GerenciadorInterface {
                 if let Some(mut label_resultado) = self.label_resultado.clone() {
                     label_resultado.set_visible(false);
                 }
-                if let Some(mut label_reiniciar) = self.label_reiniciar.clone() {
-                    label_reiniciar.set_visible(false);
-                }
-                if let Some(mut label_instrucao) = self.label_instrucao_dificuldade.clone() {
-                    label_instrucao.set_visible(true);
+                if let Some(mut botao_continuar) = self.botao_continuar.clone() {
+                    botao_continuar.set_visible(false);
                 }
                 if let Some(mut label_ajuda) = self.label_ajuda_posicionamento.clone() {
                     label_ajuda.set_visible(false);
-                }
-                if let Some(mut botao) = self.botao_facil.clone() {
-                    botao.set_visible(true);
-                }
-                if let Some(mut botao) = self.botao_medio.clone() {
-                    botao.set_visible(true);
-                }
-                if let Some(mut botao) = self.botao_dificil.clone() {
-                    botao.set_visible(true);
                 }
             }
             EstadoTurno::PosicionamentoJogador => {
@@ -216,23 +170,11 @@ impl GerenciadorInterface {
                 if let Some(mut label_resultado) = self.label_resultado.clone() {
                     label_resultado.set_visible(false);
                 }
-                if let Some(mut label_reiniciar) = self.label_reiniciar.clone() {
-                    label_reiniciar.set_visible(false);
-                }
-                if let Some(mut label_instrucao) = self.label_instrucao_dificuldade.clone() {
-                    label_instrucao.set_visible(false);
+                if let Some(mut botao_continuar) = self.botao_continuar.clone() {
+                    botao_continuar.set_visible(false);
                 }
                 if let Some(mut label_ajuda) = self.label_ajuda_posicionamento.clone() {
                     label_ajuda.set_visible(true);
-                }
-                if let Some(mut botao) = self.botao_facil.clone() {
-                    botao.set_visible(false);
-                }
-                if let Some(mut botao) = self.botao_medio.clone() {
-                    botao.set_visible(false);
-                }
-                if let Some(mut botao) = self.botao_dificil.clone() {
-                    botao.set_visible(false);
                 }
             }
             EstadoTurno::TurnoJogador | EstadoTurno::TurnoIA => {
@@ -251,8 +193,8 @@ impl GerenciadorInterface {
                 if let Some(mut label_resultado) = self.label_resultado.clone() {
                     label_resultado.set_visible(false);
                 }
-                if let Some(mut label_reiniciar) = self.label_reiniciar.clone() {
-                    label_reiniciar.set_visible(false);
+                if let Some(mut botao_continuar) = self.botao_continuar.clone() {
+                    botao_continuar.set_visible(false);
                 }
                 if let Some(mut label_ajuda) = self.label_ajuda_posicionamento.clone() {
                     label_ajuda.set_visible(false);
@@ -269,8 +211,8 @@ impl GerenciadorInterface {
                     label_resultado.set_text("Vitoria!");
                     label_resultado.set_visible(true);
                 }
-                if let Some(mut label_reiniciar) = self.label_reiniciar.clone() {
-                    label_reiniciar.set_visible(true);
+                if let Some(mut botao_continuar) = self.botao_continuar.clone() {
+                    botao_continuar.set_visible(true);
                 }
                 if let Some(mut label_ajuda) = self.label_ajuda_posicionamento.clone() {
                     label_ajuda.set_visible(false);
@@ -287,8 +229,8 @@ impl GerenciadorInterface {
                     label_resultado.set_text("Derrota!");
                     label_resultado.set_visible(true);
                 }
-                if let Some(mut label_reiniciar) = self.label_reiniciar.clone() {
-                    label_reiniciar.set_visible(true);
+                if let Some(mut botao_continuar) = self.botao_continuar.clone() {
+                    botao_continuar.set_visible(true);
                 }
                 if let Some(mut label_ajuda) = self.label_ajuda_posicionamento.clone() {
                     label_ajuda.set_visible(false);
@@ -298,5 +240,33 @@ impl GerenciadorInterface {
                 // Estado transitório, não precisa mostrar nada
             }
         }
+    }
+
+    pub fn mostrar_botao_confirmar(&mut self) {
+        if let Some(mut botao) = self.botao_confirmar_posicionamento.clone() {
+            botao.set_visible(true);
+        }
+    }
+
+    pub fn esconder_botao_confirmar(&mut self) {
+        if let Some(mut botao) = self.botao_confirmar_posicionamento.clone() {
+            botao.set_visible(false);
+        }
+    }
+
+    pub fn mostrar_container_navios(&mut self) {
+        if let Some(mut container) = self.container_navios.clone() {
+            container.set_visible(true);
+        }
+    }
+
+    pub fn esconder_container_navios(&mut self) {
+        if let Some(mut container) = self.container_navios.clone() {
+            container.set_visible(false);
+        }
+    }
+
+    pub fn container_navios(&self) -> Option<Gd<GridContainer>> {
+        self.container_navios.clone()
     }
 }
