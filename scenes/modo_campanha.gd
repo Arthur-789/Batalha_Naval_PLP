@@ -18,6 +18,7 @@ const BATTLE_SCENE_PATH := "res://scenes/cena-batalha.tscn"
 @onready var marker_intermediaria: Label = $IAIntermediaria
 @onready var marker_dificil: Label = $IADificil
 @onready var hud_hint: Label = $HUD/Hint
+@onready var botao_comecar: Button = $HUD/BotaoComecar
 
 var stage_positions: Array[Vector2] = []
 var path_points: PackedVector2Array = PackedVector2Array()
@@ -27,6 +28,8 @@ var active_tween: Tween
 func _ready() -> void:
 	ship_sprite.scale = SHIP_SCALE
 	progress_line.visible = false
+	botao_comecar.visible = false
+	botao_comecar.pressed.connect(_on_botao_comecar_pressed)
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	_update_layout()
 
@@ -46,9 +49,9 @@ func _ready() -> void:
 	_set_stage(next_stage, true)
 
 	if is_instance_valid(active_tween):
-		active_tween.finished.connect(_iniciar_proxima_batalha)
+		active_tween.finished.connect(_on_barco_chegou_ao_destino)
 	else:
-		_iniciar_proxima_batalha()
+		_on_barco_chegou_ao_destino()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
@@ -166,6 +169,13 @@ func _set_stage(stage: int, animate: bool) -> void:
 		active_tween.tween_property(ship_sprite, "global_position", target_position, MOVE_DURATION)
 	else:
 		ship_sprite.global_position = target_position
+
+func _on_barco_chegou_ao_destino() -> void:
+	botao_comecar.visible = true
+
+func _on_botao_comecar_pressed() -> void:
+	botao_comecar.visible = false
+	_iniciar_proxima_batalha()
 
 func _iniciar_proxima_batalha() -> void:
 	get_tree().change_scene_to_file(BATTLE_SCENE_PATH)

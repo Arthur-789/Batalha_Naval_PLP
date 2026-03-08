@@ -1,5 +1,5 @@
 use godot::classes::{INode2D, Input, InputEvent, InputEventKey, InputEventMouseButton, Label, Node2D, TileMapLayer};
-use godot::global::{Key, MouseButton};
+use godot::global::MouseButton;
 use godot::prelude::*;
 
 use crate::application::fase_posicionamento::FasePosicionamento;
@@ -32,6 +32,7 @@ pub struct ControladorBatalha {
     estado_anterior: EstadoTurno,
     tooltip_instrucao: Option<Gd<Label>>,
     resultado_final_emitido: bool,
+    vitoria_registrada: Option<bool>,
     base: Base<Node2D>,
 }
 
@@ -55,6 +56,7 @@ impl INode2D for ControladorBatalha {
             estado_anterior: EstadoTurno::SelecaoDificuldade,
             tooltip_instrucao: None,
             resultado_final_emitido: false,
+            vitoria_registrada: None,
             base,
         }
     }
@@ -139,17 +141,8 @@ impl INode2D for ControladorBatalha {
     }
 
     fn input(&mut self, event: Gd<InputEvent>) {
-        // Detectar R para reiniciar quando o jogo terminou
+        // Game over state is handled by the Continuar button
         if self.gerenciador_turnos.jogo_terminou() {
-            if let Ok(key_event) = event.try_cast::<InputEventKey>() {
-                if key_event.is_pressed() && !key_event.is_echo() {
-                    let keycode = key_event.get_keycode();
-                    if keycode == Key::R {
-                        let mut tree = self.base().get_tree();
-                        tree.reload_current_scene();
-                    }
-                }
-            }
             return;
         }
 
@@ -246,6 +239,14 @@ impl ControladorBatalha {
             self.iniciar_fase_batalha();
         }
     }
+
+    #[func]
+    pub fn continuar(&mut self) {
+        if let Some(vitoria) = self.vitoria_registrada {
+            self.base_mut()
+                .emit_signal("batalha_encerrada", &[vitoria.to_variant()]);
+        }
+    }
 }
 
 impl ControladorBatalha {
@@ -255,8 +256,8 @@ impl ControladorBatalha {
         }
 
         self.resultado_final_emitido = true;
-        self.base_mut()
-            .emit_signal("batalha_encerrada", &[vitoria.to_variant()]);
+        self.vitoria_registrada = Some(vitoria);
+        // Signal will be emitted by continuar() method when button is pressed
     }
 
     fn atualizar_tooltip_posicionamento(&mut self) {
