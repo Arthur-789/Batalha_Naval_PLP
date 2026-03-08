@@ -367,6 +367,10 @@ tile_set = SubResource("TileSet_fw6bw")
 
 [node name="ControladorBatalha" type="ControladorBatalha" parent="." unique_id=200106303]
 
+[node name="UILayer" type="CanvasLayer" parent="ControladorBatalha"]
+
+[node name="ContainerNavios" type="GridContainer" parent="ControladorBatalha/UILayer"]
+
 [node name="AudioManager" type="Node2D" parent="ControladorBatalha" unique_id=453797652]
 
 [node name="sfx_destruicao" type="AudioStreamPlayer" parent="ControladorBatalha/AudioManager" unique_id=1333424358]
