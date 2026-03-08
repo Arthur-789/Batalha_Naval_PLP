@@ -449,6 +449,10 @@ text = "Perder (Teste)"
 offset_right = 8.0
 offset_bottom = 8.0
 
+[node name="ContainerNavios" type="VBoxContainer" parent="ControladorBatalha" unique_id=1097507260]
+offset_right = 40.0
+offset_bottom = 40.0
+
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1329829903]
 position = Vector2(300, 200)
 

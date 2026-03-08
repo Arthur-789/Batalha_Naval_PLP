@@ -431,6 +431,7 @@ impl ControladorBatalha {
         }
 
         // Se não havia navio na posição, tentar posicionar o navio selecionado
+        // Tentar posicionar novo navio
         match self
             .fase_posicionamento
             .tentar_posicionar_navio(&mut self.jogador_humano, x, y)
@@ -438,6 +439,7 @@ impl ControladorBatalha {
             Ok(_) => {
                 self.atualizar_visual_meu_campo();
                 self.atualizar_container_navios();
+
             }
             Err(_) => {}
         }

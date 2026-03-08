@@ -55,6 +55,26 @@ impl RepositorioUsuario for RepositorioUsuarioJson {
             .cloned()
     }
 
+    fn atualizar(&mut self, usuario: Usuario) -> Result<(), String> {
+        let pos = self.users
+            .iter()
+            .position(|u| u.id == usuario.id)
+            .ok_or("Usuário não encontrado".to_string())?;
+
+        self.users[pos] = usuario;
+        self.persist()
+    }
+
+    fn excluir(&mut self, id: u64) -> Result<(), String> {
+        let pos = self.users
+            .iter()
+            .position(|u| u.id == id)
+            .ok_or("Usuário não encontrado".to_string())?; 
+
+        self.users.remove(pos);
+        self.persist()
+    }
+
     fn listar(&self) -> Vec<Usuario> {
         self.users.clone()
     }
