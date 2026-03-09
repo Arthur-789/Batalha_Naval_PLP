@@ -95,4 +95,33 @@ impl UsuarioNode {
             .excluir_conta(&login.to_string(), &senha.to_string())
             .is_ok()
     }
+
+    #[func]
+    pub fn adicionar_conquista(&mut self, login: GString, conquista: GString) -> bool {
+        let conquista = match conquista.to_string().as_str() {
+            "Almirante" => Conquista::Almirante,
+            "Capitao" => Conquista::Capitao,
+            "CapitaoDeMarEGuerra" => Conquista::CapitaoDeMarEGuerra,
+            "Marinheiro" => Conquista::Marinheiro,
+            _ => return false
+        };
+
+        self.service
+            .adicionar_conquista(&login.to_string(), conquista)
+            .is_ok()
+    }
+
+    #[func]
+    pub fn listar_conquistas(&self, login: GString) -> PackedStringArray {
+        match self.service.listar_conquistas(&login.to_string()) {
+            Ok(conquistas) => {
+                let mut array = PackedStringArray::new();
+                for c in conquistas {
+                    array.push(&GString::from(conquista_para_str(&c)));
+                }
+                array
+            },
+            Err(_) => PackedStringArray::new()
+        }
+    }
 }

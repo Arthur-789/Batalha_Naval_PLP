@@ -3,7 +3,9 @@ use argon2::{
     Argon2,
 };
 use crate::domain::entidades::usuario::Usuario;
+use crate::domain::entidades::conquista::Conquista;
 use crate::domain::repositorios::repositorio_usuario::RepositorioUsuario;
+use crate::application::services::conquista_service::ConquistaService;
 
 pub struct UsuarioService<R: RepositorioUsuario> {
     pub repo: R
@@ -105,6 +107,24 @@ impl<R: RepositorioUsuario> UsuarioService<R> {
     pub fn excluir_conta(&mut self, login: &str, senha: &str) -> Result<(), String> {
         let usuario = self.login(login,senha)?;
         self.repo.excluir(usuario.id)
+    }
+
+    pub fn adicionar_conquista(&mut self, login: &str, conquista: Conquista) -> Result<(), String> {
+        let mut usuario = self.repo
+            .achar_por_login(login)
+            .ok_or("Usuário não encontrado".to_string())?;
+
+        ConquistaService.adicionar_conquista(&mut usuario, conquista);
+
+        self.repo.atualizar(usuario)
+    }
+
+    pub fn listar_conquistas(&self, login: &str) -> Result<Vec<Conquista>, String> {
+        let usuario = self.repo
+            .achar_por_login(login)
+            .ok_or("Usuário não encontrado".to_string())?;
+
+        Ok(ConquistaService.listar_conquistas(&usuario).clone())
     }
 }
 
