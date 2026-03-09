@@ -386,6 +386,11 @@ impl ControladorBatalha {
             godot_print!("Navio {} selecionado", indice);
         }
     }
+
+    #[func]
+    pub fn obter_rodadas(&self) -> i32 {
+        self.gerenciador_turnos.rodada_atual() as i32
+    }
 }
 
 impl ControladorBatalha {
