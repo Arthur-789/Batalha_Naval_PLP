@@ -1,6 +1,6 @@
 extends Control
 
-const SHIP_SCALE := Vector2(0.085, 0.085)
+const SHIP_SCALE := Vector2(1, 1)
 const MOVE_DURATION := 2.0
 const MARKER_OFFSET_FACIL := Vector2(-20.0, 25.0)
 const MARKER_OFFSET_INTERMEDIARIA := Vector2(-37.5, 25.0)

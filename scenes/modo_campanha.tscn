@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://doq1yqqmf3pi8"]
 
-[ext_resource type="Script" uid="uid://lakh22po1b1c" path="res://scenes/modo_campanha.gd" id="1_4b4o7"]
-[ext_resource type="Texture2D" uid="uid://diwy8f0lrhb22" path="res://docs/modo campanha/Background modo campanha.png" id="2_8r751"]
-[ext_resource type="Texture2D" uid="uid://b03n1cr331moj" path="res://docs/modo campanha/Navio modo campanha.png" id="3_2r5ci"]
+[ext_resource type="Script" uid="uid://cg2ly1hvnw61f" path="res://scenes/modo_campanha.gd" id="1_4b4o7"]
+[ext_resource type="Texture2D" uid="uid://c7jo2xeci5mhn" path="res://textures/campanha_background.png" id="2_v40pi"]
 [ext_resource type="FontFile" uid="uid://cbvk8gbmixmbq" path="res://fonts/Retro Gaming.ttf" id="4_d8jto"]
+[ext_resource type="Texture2D" uid="uid://cq7bdo5turg10" path="res://textures/ship.png" id="4_v40pi"]
 
 [node name="ModoCampanha" type="Control" unique_id=1417522544]
 layout_mode = 3
@@ -22,7 +22,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_8r751")
+texture = ExtResource("2_v40pi")
 expand_mode = 1
 stretch_mode = 6
 
@@ -69,8 +69,7 @@ theme_override_font_sizes/font_size = 14
 text = "Abismo do Kraken"
 
 [node name="Ship" type="Sprite2D" parent="." unique_id=165950354]
-position = Vector2(151, 917)
-texture = ExtResource("3_2r5ci")
+texture = ExtResource("4_v40pi")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=776535780]
 
@@ -90,7 +89,7 @@ theme_override_fonts/font = ExtResource("4_d8jto")
 theme_override_font_sizes/font_size = 8
 horizontal_alignment = 1
 
-[node name="BotaoComecar" type="Button" parent="HUD"]
+[node name="BotaoComecar" type="Button" parent="HUD" unique_id=1323771933]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0

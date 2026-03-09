@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://diwy8f0lrhb22"
-path="res://.godot/imported/Background modo campanha.png-f94caf1a7b9a3021c6b971121251cdb0.ctex"
+uid="uid://c7jo2xeci5mhn"
+path="res://.godot/imported/campanha_background.png-d4c7bbb2e912aa31dc93ee92c78289e7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/modo campanha/Background modo campanha.png"
-dest_files=["res://.godot/imported/Background modo campanha.png-f94caf1a7b9a3021c6b971121251cdb0.ctex"]
+source_file="res://textures/campanha_background.png"
+dest_files=["res://.godot/imported/campanha_background.png-d4c7bbb2e912aa31dc93ee92c78289e7.ctex"]
 
 [params]
 
