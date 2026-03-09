@@ -479,17 +479,17 @@ offset_right = 40.0
 offset_bottom = 21.0
 
 [node name="BotaoVitoriaTeste" type="Button" parent="ControladorBatalha" unique_id=299649209]
-offset_left = 446.0
-offset_top = 12.0
-offset_right = 592.0
-offset_bottom = 42.0
+offset_left = 15.0
+offset_top = 357.0
+offset_right = 177.0
+offset_bottom = 387.0
 text = "Ganhar (Teste)"
 
 [node name="BotaoDerrotaTeste" type="Button" parent="ControladorBatalha" unique_id=1508778594]
-offset_left = 446.0
-offset_top = 46.0
-offset_right = 592.0
-offset_bottom = 76.0
+offset_left = 422.0
+offset_top = 356.0
+offset_right = 582.0
+offset_bottom = 386.0
 text = "Perder (Teste)"
 
 [node name="BotaoXRay" type="Button" parent="ControladorBatalha" unique_id=178916245]
