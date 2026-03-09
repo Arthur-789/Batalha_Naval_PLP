@@ -578,7 +578,7 @@ impl EstrategiaDificil {
                 sequencia.push((cx, y));
             }
         }
-        // Se não tem adjacentes, é um navio de tamanho 1 (submarino)
+        // Se não tem adjacentes, é um navio de tamanho 1 
         
         sequencia
     }
