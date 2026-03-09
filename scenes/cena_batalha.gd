@@ -14,7 +14,6 @@ func _ready() -> void:
 	if controlador.has_signal("batalha_encerrada"):
 		controlador.connect("batalha_encerrada", Callable(self, "_on_batalha_encerrada"))
 
-	controlador.call("definir_modo_dinamico", CampaignState.modo_campanha == "dinamica")
 	_call_forced_campaign_difficulty()
 
 func _call_forced_campaign_difficulty() -> void:
@@ -32,9 +31,39 @@ func _on_batalha_encerrada(vitoria: bool) -> void:
 	if not CampaignState.em_campanha:
 		return
 
+	var usuario_node = UsuarioNode.new()
+	var login_atual = ""
+	
+	var caminho_absoluto = ProjectSettings.globalize_path("res://dados/usuario_atual.json")
+	var file = FileAccess.open(caminho_absoluto, FileAccess.READ)
+	
+	if file:
+		var json_text = file.get_as_text()
+		file.close()
+		
+		var dict = JSON.parse_string(json_text)
+		if dict is Dictionary:
+			login_atual = dict.get("login", "")
+
 	if vitoria:
 		CampaignState.registrar_vitoria()
-
+		if login_atual != "":
+			usuario_node.registrar_vitoria(login_atual)
+			
+			var rodadas = controlador.call("obter_rodadas")
+			if rodadas <= 20:
+				usuario_node.adicionar_conquista(login_atual, "Marinheiro")
+				
+			var max_acertos = controlador.call("obter_max_acertos_seguidos")
+			if max_acertos >= 7:
+				usuario_node.adicionar_conquista(login_atual, "Capitao")
+			if max_acertos >= 8:
+				usuario_node.adicionar_conquista(login_atual, "CapitaoDeMarEGuerra")
+				
+			var perdeu_navio = controlador.call("jogador_perdeu_algum_navio")
+			if not perdeu_navio:
+				usuario_node.adicionar_conquista(login_atual, "Almirante")
+		
 		if CampaignState.vitorias >= 3 or CampaignState.campanha_concluida:
 			get_tree().change_scene_to_file(VITORIA_SCENE_PATH)
 		else:
@@ -42,4 +71,7 @@ func _on_batalha_encerrada(vitoria: bool) -> void:
 		return
 
 	CampaignState.registrar_derrota()
+	if login_atual != "":
+		usuario_node.registrar_derrota(login_atual)
+		
 	get_tree().change_scene_to_file(DERROTA_SCENE_PATH)

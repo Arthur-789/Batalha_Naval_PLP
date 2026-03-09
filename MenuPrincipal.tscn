@@ -437,43 +437,6 @@ text = "BattleShip Rust"
 label_settings = SubResource("LabelSettings_knros")
 horizontal_alignment = 1
 
-[node name="MargemBotoes" type="PanelContainer" parent="." unique_id=360564036]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -225.0
-offset_top = -66.0
-offset_right = -94.0
-offset_bottom = 132.0
-grow_horizontal = 0
-grow_vertical = 2
-
-[node name="botoes" type="VBoxContainer" parent="MargemBotoes" unique_id=1054789272]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/separation = 15
-script = ExtResource("3_pi62y")
-
-[node name="start" parent="MargemBotoes/botoes" unique_id=1246405146 instance=ExtResource("3_ectly")]
-layout_mode = 2
-text = "Modo Campanha"
-
-[node name="dinamico" parent="MargemBotoes/botoes" unique_id=188357110 instance=ExtResource("3_ectly")]
-layout_mode = 2
-text = "Modo Dinâmico"
-
-[node name="ranking" parent="MargemBotoes/botoes" unique_id=568151745 instance=ExtResource("3_ectly")]
-layout_mode = 2
-text = "Ranking"
-
-[node name="sair" parent="MargemBotoes/botoes" unique_id=1385780686 instance=ExtResource("3_ectly")]
-layout_mode = 2
-text = "Sair"
-
 [node name="logo" type="TextureRect" parent="." unique_id=11556763]
 layout_mode = 1
 anchors_preset = 5
@@ -485,3 +448,34 @@ offset_bottom = 102.0
 grow_horizontal = 2
 texture = ExtResource("5_ectly")
 expand_mode = 1
+
+[node name="botoes" type="VBoxContainer" parent="." unique_id=1054789272]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 83.0
+offset_right = 214.0
+offset_bottom = 313.0
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme_override_constants/separation = 15
+script = ExtResource("3_pi62y")
+
+[node name="start" parent="botoes" unique_id=1246405146 instance=ExtResource("3_ectly")]
+layout_mode = 2
+text = "Modo Campanha"
+
+[node name="dinamico" parent="botoes" unique_id=188357110 instance=ExtResource("3_ectly")]
+layout_mode = 2
+text = "Modo Dinâmico"
+
+[node name="ranking" parent="botoes" unique_id=568151745 instance=ExtResource("3_ectly")]
+layout_mode = 2
+text = "Ranking"
+
+[node name="conquistas" parent="botoes" unique_id=831342060 instance=ExtResource("3_ectly")]
+layout_mode = 2
+text = "Conquistas"
+
+[node name="sair" parent="botoes" unique_id=1385780686 instance=ExtResource("3_ectly")]
+layout_mode = 2
+text = "Sair"

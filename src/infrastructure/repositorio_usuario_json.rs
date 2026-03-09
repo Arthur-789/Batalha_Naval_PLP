@@ -1,5 +1,6 @@
-use std::fs;
-use std::path::Path;
+use godot::prelude::*;
+use godot::classes::FileAccess;
+use godot::classes::file_access::ModeFlags;
 use crate::domain::entidades::usuario::Usuario;
 use crate::domain::repositorios::repositorio_usuario::RepositorioUsuario;
 
@@ -9,15 +10,14 @@ pub struct RepositorioUsuarioJson {
 }
 
 impl RepositorioUsuarioJson {
-
     pub fn new(path: &str) -> Self {
-        garantir_diretorio_pai(path);
+        let mut data = String::from("[]");
 
-        let data = fs::read_to_string(path)
-            .unwrap_or_else(|_| "[]".to_string());
+        if FileAccess::file_exists(path) {
+            data = FileAccess::get_file_as_string(path).to_string();
+        }
 
-        let users: Vec<Usuario> =
-            serde_json::from_str(&data).unwrap_or_default();
+        let users: Vec<Usuario> = serde_json::from_str(&data).unwrap_or_default();
 
         Self {
             path: path.to_string(),
@@ -26,62 +26,44 @@ impl RepositorioUsuarioJson {
     }
 
     fn persist(&self) -> Result<(), String> {
-        garantir_diretorio_pai(&self.path);
-
-        let json =
-            serde_json::to_string_pretty(&self.users)
+        let json = serde_json::to_string_pretty(&self.users)
             .map_err(|e| e.to_string())?;
 
-        fs::write(&self.path, json)
-            .map_err(|e| e.to_string())?;
-
-        Ok(())
-    }
-}
-
-fn garantir_diretorio_pai(path: &str) {
-    if let Some(parent) = Path::new(path).parent() {
-        let _ = fs::create_dir_all(parent);
+        if let Some(mut file) = FileAccess::open(&self.path, ModeFlags::WRITE) {
+            file.store_string(&json);
+            file.flush();
+            file.close();
+            Ok(())
+        } else {
+            Err("Falha ao salvar o arquivo pelo Godot".to_string())
+        }
     }
 }
 
 impl RepositorioUsuario for RepositorioUsuarioJson {
-
     fn salvar(&mut self, usuario: Usuario) -> Result<(), String> {
         self.users.push(usuario);
         self.persist()
     }
 
     fn achar_por_login(&self, login: &str) -> Option<Usuario> {
-        self.users
-            .iter()
-            .find(|u| u.login == login)
-            .cloned()
+        self.users.iter().find(|u| u.login == login).cloned()
     }
 
     fn achar_por_id(&self, id: u64) -> Option<Usuario> {
-        self.users
-            .iter()
-            .find(|u| u.id == id)
-            .cloned()
+        self.users.iter().find(|u| u.id == id).cloned()
     }
 
     fn atualizar(&mut self, usuario: Usuario) -> Result<(), String> {
-        let pos = self.users
-            .iter()
-            .position(|u| u.id == usuario.id)
+        let pos = self.users.iter().position(|u| u.id == usuario.id)
             .ok_or("Usuário não encontrado".to_string())?;
-
         self.users[pos] = usuario;
         self.persist()
     }
 
     fn excluir(&mut self, id: u64) -> Result<(), String> {
-        let pos = self.users
-            .iter()
-            .position(|u| u.id == id)
-            .ok_or("Usuário não encontrado".to_string())?; 
-
+        let pos = self.users.iter().position(|u| u.id == id)
+            .ok_or("Usuário não encontrado".to_string())?;
         self.users.remove(pos);
         self.persist()
     }
@@ -89,5 +71,4 @@ impl RepositorioUsuario for RepositorioUsuarioJson {
     fn listar(&self) -> Vec<Usuario> {
         self.users.clone()
     }
-
 }

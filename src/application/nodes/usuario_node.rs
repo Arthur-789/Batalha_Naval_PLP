@@ -37,12 +37,17 @@ fn conquista_para_str(conquista: &Conquista) -> &'static str {
     }
 }
 
+use godot::classes::ProjectSettings;
+
 #[godot_api]
 impl INode for UsuarioNode {
     fn init(base: Base<Node>) -> Self {
+        let ps = ProjectSettings::singleton();
+        let path_absoluto = ps.globalize_path("res://dados/usuarios.json").to_string();
+
         Self{
             service: UsuarioService {
-                repo: RepositorioUsuarioJson::new("dados/usuarios.json")
+                repo: RepositorioUsuarioJson::new(&path_absoluto)
             },
             base
         }

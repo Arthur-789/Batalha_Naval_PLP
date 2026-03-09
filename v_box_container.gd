@@ -12,6 +12,8 @@ func _ready():
 		$dinamico.pressed.connect(_on_dinamico_pressed)
 	if not $ranking.pressed.is_connected(_on_ranking_pressed):
 		$ranking.pressed.connect(_on_ranking_pressed)
+	if not $conquistas.pressed.is_connected(_on_conquistas_pressed):
+		$conquistas.pressed.connect(_on_conquistas_pressed)
 	if not $sair.pressed.is_connected(_on_sair_pressed):
 		$sair.pressed.connect(_on_sair_pressed)
 
@@ -25,6 +27,9 @@ func _on_dinamico_pressed():
 
 func _on_ranking_pressed():
 	get_tree().change_scene_to_file("res://scenes/tela_ranking.tscn")
+
+func _on_conquistas_pressed():
+	get_tree().change_scene_to_file("res://scenes/CenaConquistas.tscn")
 
 func _on_sair_pressed():
 	var file := FileAccess.open(SESSION_FILE_PATH, FileAccess.WRITE)

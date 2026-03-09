@@ -1,0 +1,169 @@
+[gd_scene format=3 uid="uid://cfdpjld7xbbpi"]
+
+[ext_resource type="Texture2D" uid="uid://bvohqbojf8dga" path="res://textures/fundo_conquistas.png" id="1_p1bjh"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ni2u1"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(0, 0, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ywvyq"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(800, 0, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4x0qr"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(1600, 0, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7c742"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(2400, 0, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t311i"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(3200, 0, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ltwv5"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(0, 336, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_38m8x"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(800, 336, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kw8n8"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(1600, 336, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sdnac"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(2400, 336, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_23i4u"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(3200, 336, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_06i7k"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(0, 672, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sqawa"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(800, 672, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u2gup"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(1600, 672, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e2dtd"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(2400, 672, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yfqao"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(3200, 672, 800, 336)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t3u7a"]
+atlas = ExtResource("1_p1bjh")
+region = Rect2(0, 1008, 800, 336)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_gvac2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ni2u1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ywvyq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4x0qr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7c742")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t311i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ltwv5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_38m8x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kw8n8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sdnac")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_23i4u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_06i7k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sqawa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u2gup")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e2dtd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yfqao")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t3u7a")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}]
+
+[node name="CenaConquistas" type="CenaConquistas" unique_id=1324858246]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=520767142]
+position = Vector2(299.5, 200)
+scale = Vector2(0.7462501, 1.1964285)
+sprite_frames = SubResource("SpriteFrames_gvac2")
+autoplay = "default"
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=591997915]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7058824)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1734839359]
+light_mask = 0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="botao_voltar" type="Button" parent="." unique_id=2142018640]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 24.0
+offset_right = 93.0
+offset_bottom = 53.0
+text = "Voltar
+"

@@ -2,3 +2,4 @@
 mod cena_ranking;
 pub mod batalha;
 mod cena_fim_de_jogo;
+mod cena_conquistas;
