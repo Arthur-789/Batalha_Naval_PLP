@@ -8,15 +8,15 @@ var _label: Label
 func _ready() -> void:
 	_label = Label.new()
 	_label.name = "UsuarioLogadoLabel"
-	_label.anchor_left = 1.0
-	_label.anchor_top = 1.0
-	_label.anchor_right = 1.0
-	_label.anchor_bottom = 1.0
-	_label.offset_left = -250.0
-	_label.offset_top = -28.0
-	_label.offset_right = -4.0
-	_label.offset_bottom = -2.0
-	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_label.anchor_left = 0.0
+	_label.anchor_top = 0.0
+	_label.anchor_right = 0.0
+	_label.anchor_bottom = 0.0
+	_label.offset_left = 4.0
+	_label.offset_top = 4.0
+	_label.offset_right = 250.0
+	_label.offset_bottom = 28.0
+	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_label.scale = Vector2(0.75, 0.75)
 	_label.add_theme_constant_override("outline_size", 8)
 	_label.add_theme_color_override("font_outline_color", Color(0.12, 0.36, 0.92, 1.0))
