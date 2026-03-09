@@ -23,6 +23,13 @@ pub struct Navio {
     pub acertos: usize,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct MovimentoNavio {
+    pub navio_idx: usize,
+    pub dx: i32,
+    pub dy: i32,
+}
+
 impl Navio {
     pub fn novo(nome: &str, tamanho: usize) -> Self {
         Self {
@@ -73,13 +80,115 @@ impl EstadoTabuleiro {
     pub fn afundar_navio(&mut self, navio_idx: usize) {
         for x in 0..BOARD_SIZE {
             for y in 0..BOARD_SIZE {
-                if let Celula::Atingido(idx) = self.cells[x][y] {
-                    if idx == navio_idx {
+                match self.cells[x][y] {
+                    Celula::Ocupado(idx) | Celula::Atingido(idx) if idx == navio_idx => {
                         self.cells[x][y] = Celula::Afundado(navio_idx);
                     }
+                    _ => {}
                 }
             }
         }
+    }
+
+    pub fn obter_celulas_navio(&self, navio_idx: usize) -> Vec<(usize, usize)> {
+        let mut celulas = Vec::new();
+        for x in 0..BOARD_SIZE {
+            for y in 0..BOARD_SIZE {
+                match self.cells[x][y] {
+                    Celula::Ocupado(idx) | Celula::Atingido(idx) | Celula::Afundado(idx)
+                        if idx == navio_idx =>
+                    {
+                        celulas.push((x, y));
+                    }
+                    _ => {}
+                }
+            }
+        }
+        celulas
+    }
+
+    pub fn listar_movimentos_validos(&self) -> Vec<MovimentoNavio> {
+        let mut movimentos = Vec::new();
+        for navio_idx in 0..self.navios.len() {
+            if self.navios[navio_idx].esta_afundado() {
+                continue;
+            }
+            for (dx, dy) in [(-1, 0), (1, 0), (0, -1), (0, 1)] {
+                if self.pode_mover_navio(navio_idx, dx, dy) {
+                    movimentos.push(MovimentoNavio { navio_idx, dx, dy });
+                }
+            }
+        }
+        movimentos
+    }
+
+    pub fn pode_mover_navio(&self, navio_idx: usize, dx: i32, dy: i32) -> bool {
+        if navio_idx >= self.navios.len() {
+            return false;
+        }
+        if self.navios[navio_idx].acertos > 0 || self.navios[navio_idx].esta_afundado() {
+            return false;
+        }
+        if (dx.abs() + dy.abs()) != 1 {
+            return false;
+        }
+
+        let celulas = self.obter_celulas_navio(navio_idx);
+        if celulas.is_empty() {
+            return false;
+        }
+
+        for &(x, y) in &celulas {
+            let nx = x as i32 + dx;
+            let ny = y as i32 + dy;
+            if nx < 0 || ny < 0 || nx >= BOARD_SIZE as i32 || ny >= BOARD_SIZE as i32 {
+                return false;
+            }
+
+            let nxu = nx as usize;
+            let nyu = ny as usize;
+            if celulas.iter().any(|&(cx, cy)| cx == nxu && cy == nyu) {
+                continue;
+            }
+
+            let Some(destino) = self.valor_celula(nxu, nyu) else {
+                return false;
+            };
+            if !matches!(destino, Celula::Vazio) {
+                return false;
+            }
+        }
+
+        true
+    }
+
+    pub fn mover_navio(&mut self, navio_idx: usize, dx: i32, dy: i32) -> Result<(), String> {
+        if !self.pode_mover_navio(navio_idx, dx, dy) {
+            return Err("Movimento inválido".to_string());
+        }
+
+        let celulas_atuais = self.obter_celulas_navio(navio_idx);
+        let mut celulas_atingidas = Vec::new();
+        for &(x, y) in &celulas_atuais {
+            if matches!(self.cells[x][y], Celula::Atingido(_)) {
+                celulas_atingidas.push((x, y));
+            }
+        }
+
+        for &(x, y) in &celulas_atuais {
+            self.cells[x][y] = Celula::Vazio;
+        }
+        for &(x, y) in &celulas_atingidas {
+            self.cells[x][y] = Celula::AguaAtirada;
+        }
+
+        for &(x, y) in &celulas_atuais {
+            let nx = (x as i32 + dx) as usize;
+            let ny = (y as i32 + dy) as usize;
+            self.cells[nx][ny] = Celula::Ocupado(navio_idx);
+        }
+
+        Ok(())
     }
 
     pub fn validar_posicao_navio(

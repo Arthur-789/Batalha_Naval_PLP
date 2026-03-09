@@ -3,7 +3,7 @@ use godot::prelude::*;
 
 use crate::domain::disparo::RetornoDisparo;
 use crate::domain::estrategias_ia::EstrategiaIA;
-use crate::domain::tabuleiro::{Celula, EstadoTabuleiro, BOARD_SIZE};
+use crate::domain::tabuleiro::{Celula, EstadoTabuleiro, MovimentoNavio, BOARD_SIZE};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum DirecaoBusca {
@@ -169,5 +169,41 @@ impl EstrategiaIA for EstrategiaIntermediaria {
             }
             _ => {}
         }
+    }
+
+    fn escolher_movimento(
+        &mut self,
+        meu_tabuleiro: &EstadoTabuleiro,
+        _tiros_inimigo: &[[bool; BOARD_SIZE]; BOARD_SIZE],
+    ) -> Option<MovimentoNavio> {
+        let mut rng = RandomNumberGenerator::new_gd();
+        rng.randomize();
+
+        if rng.randf() < 0.30 {
+            return None;
+        }
+
+        let mut movimentos_prioritarios = Vec::new();
+        let movimentos = meu_tabuleiro.listar_movimentos_validos();
+        if movimentos.is_empty() {
+            return None;
+        }
+
+        for movimento in &movimentos {
+            let Some(navio) = meu_tabuleiro.navios.get(movimento.navio_idx) else {
+                continue;
+            };
+            if navio.acertos > 0 && !navio.esta_afundado() {
+                movimentos_prioritarios.push(*movimento);
+            }
+        }
+
+        let escolha = if movimentos_prioritarios.is_empty() {
+            &movimentos
+        } else {
+            &movimentos_prioritarios
+        };
+        let idx = rng.randi_range(0, (escolha.len() - 1) as i32) as usize;
+        Some(escolha[idx])
     }
 }

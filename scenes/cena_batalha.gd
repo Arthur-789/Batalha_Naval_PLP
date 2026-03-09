@@ -12,6 +12,7 @@ func _ready() -> void:
 	if controlador.has_signal("batalha_encerrada"):
 		controlador.connect("batalha_encerrada", Callable(self, "_on_batalha_encerrada"))
 
+	controlador.call("definir_modo_dinamico", CampaignState.modo_campanha == "dinamica")
 	_call_forced_campaign_difficulty()
 
 func _call_forced_campaign_difficulty() -> void:

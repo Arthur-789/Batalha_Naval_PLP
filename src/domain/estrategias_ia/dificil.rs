@@ -3,7 +3,7 @@ use godot::prelude::*;
 
 use crate::domain::disparo::{ResultadoDisparo, RetornoDisparo};
 use crate::domain::estrategias_ia::EstrategiaIA;
-use crate::domain::tabuleiro::{EstadoTabuleiro, BOARD_SIZE, FROTA_PADRAO};
+use crate::domain::tabuleiro::{EstadoTabuleiro, MovimentoNavio, BOARD_SIZE, FROTA_PADRAO};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum EstadoCelula {
@@ -34,6 +34,27 @@ impl EstrategiaDificil {
             mapa_conhecimento: [[EstadoCelula::Desconhecido; BOARD_SIZE]; BOARD_SIZE],
             todos_acertos: Vec::new(),
         }
+    }
+
+
+    fn top_alvos_probabilidade(
+        &self,
+        probabilidades: &[[f32; BOARD_SIZE]; BOARD_SIZE],
+        limite: usize,
+    ) -> Vec<(usize, usize)> {
+        let mut celulas = Vec::new();
+        for x in 0..BOARD_SIZE {
+            for y in 0..BOARD_SIZE {
+                celulas.push((x, y, probabilidades[x][y]));
+            }
+        }
+        celulas.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal));
+        celulas
+            .into_iter()
+            .filter(|(_, _, p)| *p > 0.0)
+            .take(limite)
+            .map(|(x, y, _)| (x, y))
+            .collect()
     }
 
     fn calcular_mapa_probabilidades(&self) -> [[f32; BOARD_SIZE]; BOARD_SIZE] {
@@ -565,6 +586,8 @@ impl EstrategiaDificil {
 
 impl EstrategiaIA for EstrategiaDificil {
     fn escolher_alvo(&mut self, _tabuleiro: &EstadoTabuleiro) -> Option<(usize, usize)> {
+        let probabilidades = self.calcular_mapa_probabilidades();
+
         // 🎯 FASE 1: Prioridade ABSOLUTA - atacar navios lineares já encontrados
         if !self.acertos_ativos.is_empty() {
             let grupos = self.encontrar_grupos_lineares();
@@ -600,9 +623,6 @@ impl EstrategiaIA for EstrategiaDificil {
         }
         
         // 🎯 FASE 2: Sistema de probabilidades (caça ou exploração)
-        godot_print!("IA Difícil: 🧮 Usando sistema de probabilidades");
-        let probabilidades = self.calcular_mapa_probabilidades();
-        
         self.escolher_melhor_celula(&probabilidades)
     }
 
@@ -610,7 +630,6 @@ impl EstrategiaIA for EstrategiaDificil {
         match &resultado.resultado {
             ResultadoDisparo::Agua => {
                 self.mapa_conhecimento[x][y] = EstadoCelula::Agua;
-                // A confirmação de navios destruídos agora vem exclusivamente do som de destruição
             }
             ResultadoDisparo::Acerto => {
                 self.mapa_conhecimento[x][y] = EstadoCelula::Acerto;
@@ -659,10 +678,78 @@ impl EstrategiaIA for EstrategiaDificil {
                 for &pos in &sequencia {
                     self.acertos_ativos.retain(|&p| p != pos);
                 }
-                
-                godot_print!("IA Difícil: 🎯 Acertos ativos restantes: {:?}", self.acertos_ativos);
             }
             _ => {}
+        }
+    }
+
+    fn escolher_movimento(
+        &mut self,
+        meu_tabuleiro: &EstadoTabuleiro,
+        _tiros_inimigo: &[[bool; BOARD_SIZE]; BOARD_SIZE],
+    ) -> Option<MovimentoNavio> {
+        let movimentos = meu_tabuleiro.listar_movimentos_validos();
+        if movimentos.is_empty() {
+            return None;
+        }
+
+        let probabilidades = self.calcular_mapa_probabilidades();
+        let alvos_risco = self.top_alvos_probabilidade(&probabilidades, 8);
+        if alvos_risco.is_empty() {
+            return None;
+        }
+
+        let mut navios_em_risco = Vec::new();
+        for (idx, navio) in meu_tabuleiro.navios.iter().enumerate() {
+            if navio.acertos > 0 || navio.esta_afundado() {
+                continue;
+            }
+            let celulas = meu_tabuleiro.obter_celulas_navio(idx);
+            if celulas
+                .iter()
+                .any(|coord| alvos_risco.iter().any(|risco| risco == coord))
+            {
+                navios_em_risco.push(idx);
+            }
+        }
+        if navios_em_risco.is_empty() {
+            return None;
+        }
+
+        let mut melhor_mov = None;
+        let mut melhor_reducao = 0_i32;
+        for movimento in &movimentos {
+            if !navios_em_risco.contains(&movimento.navio_idx) {
+                continue;
+            }
+            let celulas = meu_tabuleiro.obter_celulas_navio(movimento.navio_idx);
+            let risco_antes = celulas
+                .iter()
+                .filter(|coord| alvos_risco.iter().any(|risco| risco == *coord))
+                .count() as i32;
+
+            let mut risco_depois = 0_i32;
+            for (x, y) in &celulas {
+                let nx = (*x as i32 + movimento.dx) as usize;
+                let ny = (*y as i32 + movimento.dy) as usize;
+                if alvos_risco
+                    .iter()
+                    .any(|&(rx, ry)| rx == nx && ry == ny)
+                {
+                    risco_depois += 1;
+                }
+            }
+            let reducao = risco_antes - risco_depois;
+            if reducao > melhor_reducao {
+                melhor_reducao = reducao;
+                melhor_mov = Some(*movimento);
+            }
+        }
+
+        if melhor_reducao > 0 {
+            melhor_mov
+        } else {
+            None
         }
     }
 }

@@ -2,7 +2,7 @@ use godot::classes::RandomNumberGenerator;
 use godot::prelude::*;
 
 use crate::domain::estrategias_ia::EstrategiaIA;
-use crate::domain::tabuleiro::{Celula, EstadoTabuleiro, BOARD_SIZE};
+use crate::domain::tabuleiro::{Celula, EstadoTabuleiro, MovimentoNavio, BOARD_SIZE};
 
 pub struct EstrategiaFacil;
 
@@ -28,5 +28,26 @@ impl EstrategiaIA for EstrategiaFacil {
         rng.randomize();
         let idx = rng.randi_range(0, (alvos_disponiveis.len() - 1) as i32) as usize;
         Some(alvos_disponiveis[idx])
+    }
+
+    fn escolher_movimento(
+        &mut self,
+        meu_tabuleiro: &EstadoTabuleiro,
+        _tiros_inimigo: &[[bool; BOARD_SIZE]; BOARD_SIZE],
+    ) -> Option<MovimentoNavio> {
+        let mut rng = RandomNumberGenerator::new_gd();
+        rng.randomize();
+
+        if rng.randf() < 0.45 {
+            return None;
+        }
+
+        let movimentos = meu_tabuleiro.listar_movimentos_validos();
+        if movimentos.is_empty() {
+            return None;
+        }
+
+        let idx = rng.randi_range(0, (movimentos.len() - 1) as i32) as usize;
+        Some(movimentos[idx])
     }
 }

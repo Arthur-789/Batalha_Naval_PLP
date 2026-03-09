@@ -4,12 +4,21 @@ var vitorias: int = 0
 var em_campanha: bool = false
 var resultado_ultima_batalha: String = "none"
 var campanha_concluida: bool = false
+var modo_campanha: String = "padrao"
 
 func iniciar_nova_campanha() -> void:
 	vitorias = 0
 	em_campanha = true
 	resultado_ultima_batalha = "none"
 	campanha_concluida = false
+	modo_campanha = "padrao"
+
+func iniciar_nova_campanha_dinamica() -> void:
+	vitorias = 0
+	em_campanha = true
+	resultado_ultima_batalha = "none"
+	campanha_concluida = false
+	modo_campanha = "dinamica"
 
 func registrar_vitoria() -> void:
 	resultado_ultima_batalha = "vitoria"
@@ -22,7 +31,9 @@ func registrar_derrota() -> void:
 	vitorias = 0
 	em_campanha = false
 	campanha_concluida = false
+	modo_campanha = "padrao"
 
 func encerrar_campanha() -> void:
 	em_campanha = false
 	resultado_ultima_batalha = "none"
+	modo_campanha = "padrao"
