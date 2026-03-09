@@ -10,10 +10,10 @@ pub struct ConfigNavio {
 }
 
 pub const FROTA_PADRAO: [ConfigNavio; 4] = [
-    ConfigNavio { nome: "Porta-Aviões", tamanho: 6, quantidade: 2 },
-    ConfigNavio { nome: "Navio de Guerra", tamanho: 4, quantidade: 2 },
-    ConfigNavio { nome: "Encouraçado", tamanho: 3, quantidade: 1 },
-    ConfigNavio { nome: "Submarino", tamanho: 1, quantidade: 1 },
+    ConfigNavio { nome: "Galeão", tamanho: 6, quantidade: 2 },
+    ConfigNavio { nome: "Fragata", tamanho: 4, quantidade: 2 },
+    ConfigNavio { nome: "Caravela", tamanho: 3, quantidade: 1 },
+    ConfigNavio { nome: "Corveta", tamanho: 1, quantidade: 1 },
 ];
 
 #[derive(Clone, Debug)]
